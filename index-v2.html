@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FTS AI Headquarters 2.0</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#050b18;color:#e8faff;font-family:Arial}
+header{padding:15px;background:#091a30;border-bottom:1px solid #20d9ff}
+h2{margin:0;color:#39e8ff;font-size:18px}
+header small{color:#9bbdce}
+#office{height:58vh;min-height:330px}
+canvas{display:block}
+main{padding:12px}
+h3{color:#39e8ff;font-size:14px}
+#team{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.member{background:#10243b;border:1px solid #17617a;color:white;border-radius:9px;padding:10px;text-align:left}
+.member b{display:block;font-size:13px}
+.member small{color:#a9c6d5}
+.member:active{background:#15516b}
+#info{margin-top:12px;background:#10243b;border:1px solid #17617a;padding:13px;border-radius:10px}
+#info strong{color:#39e8ff}
+.rooms{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.rooms button{background:#12334c;color:white;border:1px solid #20d9ff;padding:10px;border-radius:8px}
+footer{padding:15px;text-align:center;color:#7899ad;font-size:11px}
+</style>
+</head>
+<body>
+<header>
+<h2>FOREX TRADING STUDIO</h2>
+<small>AI HEADQUARTERS · VERSION 2.0</small>
+</header>
+
+<div id="office"></div>
+
+<main>
+<h3>10 VIRTUAL EMPLOYEES</h3>
+<div id="team"></div>
+
+<div id="info">
+<strong>FTS HEADQUARTERS</strong>
+<p>Pilih karyawan untuk melihat jabatan dan tanggung jawabnya.</p>
+</div>
+
+<div class="rooms">
+<button onclick="moveRoom(-6,0)">MANAGEMENT</button>
+<button onclick="moveRoom(3,0)">PRODUCTION</button>
+<button onclick="moveRoom(-3,5)">GROWTH</button>
+<button onclick="home()">TAMPILAN AWAL</button>
+</div>
+</main>
+
+<footer>
+FTS AI HEADQUARTERS 2.0 · VIRTUAL OFFICE
+</footer>
+
+<script type="module">
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import {OrbitControls} from
+'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const employees=[
+['Raka','CEO','Memimpin perusahaan dan strategi.','management'],
+['Maya','Managing Director','Mengelola keputusan perusahaan.','management'],
+['Dimas','Studio Director','Mengatur arah kreatif studio.','management'],
+['Nadia','Operations','Mengatur operasional dan alur kerja.','management'],
+['Arif','AI Video Producer','Mengembangkan konsep dan prompt video.','production'],
+['Sinta','Video Producer','Menyusun scene dan storytelling.','production'],
+['Bima','Video Editor','Mengedit dan menyusun video.','production'],
+['Luna','Motion Editor','Membuat motion graphics dan efek.','production'],
+['Tara','Growth Manager','Mengembangkan strategi pertumbuhan YouTube.','growth'],
+['Fajar','Marketing','Mengelola branding dan pemasaran.','growth']
+];
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050b18);
+scene.fog=new THREE.Fog(0x050b18,20,40);
+
+const camera=new THREE.PerspectiveCamera(50,
+document.getElementById('office').clientWidth/
+document.getElementById('office').clientHeight,.1,100);
+camera.position.set(13,12,17);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(
+document.getElementById('office').clientWidth,
+document.getElementById('office').clientHeight
+);
+renderer.shadowMap.enabled=true;
+document.getElementById('office').appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.target.set(0,1,0);
+
+scene.add(new THREE.HemisphereLight(0x9bdfff,0x172039,2));
+const light=new THREE.DirectionalLight(0xffffff,2);
+light.position.set(8,15,10);
+light.castShadow=true;
+scene.add(light);
+
+const floor=new THREE.Mesh(
+new THREE.BoxGeometry(22,.3,15),
+new THREE.MeshStandardMaterial({color:0x12243a,metalness:.5})
+);
+floor.position.y=-.2;
+floor.receiveShadow=true;
+scene.add(floor);
+
+const grid=new THREE.GridHelper(22,22,0x17c9ed,0x17405b);
+grid.position.y=0;
+scene.add(grid);
+
+function makeBox(w,h,d,x,y,z,color){
+const m=new THREE.Mesh(
+new THREE.BoxGeometry(w,h,d),
+new THREE.MeshStandardMaterial({
+color:color,metalness:.4,roughness:.4
+})
+);
+m.position.set(x,y,z);
+m.castShadow=true;
+m.receiveShadow=true;
+scene.add(m);
+return m;
+}
+
+// Dinding kantor
+makeBox(22,3,.2,0,1.5,-7,0x173c57);
+makeBox(22,3,.2,0,1.5,7,0x173c57);
+makeBox(.2,3,14,-11,1.5,0,0x173c57);
+makeBox(.2,3,14,11,1.5,0,0x173c57);
+
+// Area departemen
+const zones=[
+['MANAGEMENT',-6,0,0x124b72],
+['PRODUCTION',3,0,0x11615e],
+['GROWTH',-3,5,0x49346c]
+];
+
+zones.forEach(z=>{
+makeBox(6,.12,5,z[1],.05,z[2],z[3]);
+makeBox(3,.15,.15,z[1],2,z[2]-2.3,0x20dfff);
+});
+
+const people=[];
+
+employees.forEach((e,i)=>{
+const group=new THREE.Group();
+const x=-8+(i%5)*4;
+const z=i<5?-3:4;
+
+const body=new THREE.Mesh(
+new THREE.CapsuleGeometry(.28,.65,4,8),
+new THREE.MeshStandardMaterial({
+color:new THREE.Color().setHSL(i/10,.7,.6)
+})
+);
+body.position.y=1;
+group.add(body);
+
+const head=new THREE.Mesh(
+new THREE.SphereGeometry(.23,16,16),
+new THREE.MeshStandardMaterial({color:0xf0c6a7})
+);
+head.position.y=1.62;
+group.add(head);
+
+const desk=makeBox(1.5,.15,.8,x,.8,z,0x183b58);
+group.position.set(x,0,z);
+scene.add(group);
+
+people.push({group,employee:e,phase:i});
+});
+
+const team=document.getElementById('team');
+
+employees.forEach((e,i)=>{
+const button=document.createElement('button');
+button.className='member';
+button.innerHTML='<b>'+e[0]+'</b><small>'+e[1]+'</small>';
+button.onclick=()=>showEmployee(i);
+team.appendChild(button);
+});
+
+function showEmployee(i){
+const e=employees[i];
+document.getElementById('info').innerHTML=
+'<strong>'+e[0]+' — '+e[1]+'</strong>'+
+'<p>Departemen: '+e[3].toUpperCase()+'</p>'+
+'<p>Tanggung jawab: '+e[2]+'</p>';
+controls.target.copy(people[i].group.position);
+camera.position.set(
+people[i].group.position.x+5,7,
+people[i].group.position.z+7
+);
+}
+
+window.moveRoom=(x,z)=>{
+controls.target.set(x,1,z);
+camera.position.set(x+7,8,z+8);
+};
+
+window.home=()=>{
+controls.target.set(0,1,0);
+camera.position.set(13,12,17);
+};
+
+function animate(t){
+requestAnimationFrame(animate);
+people.forEach(p=>{
+p.group.position.y=
+.04*Math.sin(t*.002+p.phase);
+p.group.rotation.y=
+.08*Math.sin(t*.001+p.phase);
+});
+controls.update();
+renderer.render(scene,camera);
+}
+animate(0);
+
+window.addEventListener('resize',()=>{
+const el=document.getElementById('office');
+camera.aspect=el.clientWidth/el.clientHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(el.clientWidth,el.clientHeight);
+});
+</script>
+</body>
+</html>
