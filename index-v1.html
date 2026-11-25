@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>FTS AI Headquarters — Prototype 1.0</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#050b18; font-family:Arial, sans-serif; color:#eaf6ff; }
+  #app { position:fixed; inset:0; }
+  canvas { display:block; width:100%; height:100%; touch-action:none; }
+  #topbar {
+    position:absolute; top:12px; left:12px; right:12px; z-index:3;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:10px 12px; border:1px solid #2c7390; border-radius:14px;
+    background:rgba(4,15,31,.82); backdrop-filter:blur(10px);
+    box-shadow:0 0 22px rgba(0,220,255,.12);
+  }
+  .brand { font-weight:800; letter-spacing:1.5px; font-size:14px; }
+  .sub { color:#7ddfff; font-size:10px; margin-top:3px; letter-spacing:1px; }
+  #status { font-size:10px; color:#8ef7c5; text-align:right; }
+  #panel {
+    position:absolute; left:12px; bottom:12px; z-index:3; width:min(290px, calc(100vw - 24px));
+    border:1px solid #245b78; border-radius:14px; padding:11px;
+    background:rgba(4,15,31,.86); backdrop-filter:blur(10px);
+  }
+  #panel h3 { margin:0 0 8px; color:#73e7ff; font-size:12px; letter-spacing:1px; }
+  #roomName { font-weight:700; font-size:14px; margin-bottom:4px; }
+  #roomDesc { font-size:11px; color:#a8c7d8; line-height:1.45; min-height:30px; }
+  .buttons { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+  button {
+    border:1px solid #267a9a; border-radius:9px; padding:8px 10px;
+    background:#102b43; color:#eafaff; font-size:11px; font-weight:700;
+    cursor:pointer; touch-action:manipulation;
+  }
+  button:active { background:#155477; }
+  #hint {
+    position:absolute; top:76px; left:50%; transform:translateX(-50%); z-index:2;
+    width:max-content; max-width:calc(100vw - 30px); text-align:center;
+    padding:7px 10px; border-radius:20px; font-size:10px; color:#c7e8f4;
+    background:rgba(3,13,27,.68); border:1px solid rgba(72,188,220,.35);
+  }
+  #loading {
+    position:absolute; inset:0; display:grid; place-items:center; z-index:10;
+    background:#050b18; color:#8ceaff; font-size:14px; text-align:center; padding:24px;
+  }
+  @media (min-width:700px) {
+    #panel { width:310px; }
+    .brand { font-size:17px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="loading">Membangun kantor virtual FTS...<br><small>Memuat aset 3D dari internet</small></div>
+<div id="topbar">
+  <div><div class="brand">FTS <span style="color:#65e8ff">AI HEADQUARTERS</span></div><div class="sub">VIRTUAL COMPANY • PROTOTYPE 1.0</div></div>
+  <div id="status">● SYSTEM ONLINE<br>3D OFFICE</div>
+</div>
+<div id="hint">Geser untuk memutar • Cubit untuk zoom • Ketuk ruangan</div>
+<div id="panel">
+  <h3>COMMAND CENTER</h3>
+  <div id="roomName">Selamat datang, CEO</div>
+  <div id="roomDesc">Ini adalah kantor virtual Forex Trading Studio. Pilih ruangan atau gunakan tombol kamera.</div>
+  <div class="buttons">
+    <button data-view="overview">Overview</button>
+    <button data-view="ceo">Ruang CEO</button>
+    <button data-view="studio">Studio</button>
+    <button data-view="marketing">Marketing</button>
+    <button id="reset">Reset Kamera</button>
+  </div>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const loading = document.getElementById('loading');
+const app = document.getElementById('app');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050b18);
+scene.fog = new THREE.Fog(0x050b18, 22, 48);
+
+const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, .1, 100);
+camera.position.set(15, 15, 19);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+app.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = .06;
+controls.maxPolarAngle = Math.PI * .48;
+controls.minDistance = 8;
+controls.maxDistance = 32;
+controls.target.set(0,0,0);
+
+scene.add(new THREE.HemisphereLight(0x9bdcff, 0x10182b, 2.0));
+const key = new THREE.DirectionalLight(0xffffff, 2.3);
+key.position.set(8,18,10); key.castShadow = true; key.shadow.mapSize.set(2048,2048);
+scene.add(key);
+const cyanLight = new THREE.PointLight(0x00cfff, 28, 24); cyanLight.position.set(-7,5,0); scene.add(cyanLight);
+const violetLight = new THREE.PointLight(0x7b45ff, 18, 20); violetLight.position.set(7,4,-5); scene.add(violetLight);
+
+const mat = (color, metalness=.15, roughness=.55, emissive=0x000000) => new THREE.MeshStandardMaterial({color, metalness, roughness, emissive, emissiveIntensity:.7});
+const floorMat = mat(0x101b2d,.45,.42);
+const dark = mat(0x101827,.25,.5);
+const glass = new THREE.MeshPhysicalMaterial({color:0x2c9bb5, metalness:.25, roughness:.16, transparent:true, opacity:.22, transmission:.12});
+const neon = mat(0x00cfff,.2,.25,0x00aaff);
+const purple = mat(0x8a54ff,.2,.25,0x4b16aa);
+const white = mat(0xd7e9f5,.1,.45);
+const wood = mat(0x604a3c,.1,.7);
+const screenMat = mat(0x071a2b,.25,.2,0x06334a);
+
+function box(parent, x,y,z, sx,sy,sz, material, cast=true) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz), material);
+  m.position.set(x,y,z); m.castShadow=cast; m.receiveShadow=true; parent.add(m); return m;
+}
+function line(parent, x1,y1,z1,x2,y2,z2, material=neon, radius=.035) {
+  const a=new THREE.Vector3(x1,y1,z1), b=new THREE.Vector3(x2,y2,z2);
+  const d=new THREE.Vector3().subVectors(b,a);
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,d.length(),8),material);
+  m.position.copy(a).add(b).multiplyScalar(.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); parent.add(m); return m;
+}
+function label(text, x,y,z, color='#8beeff', size=64) {
+  const c=document.createElement('canvas'); c.width=512; c.height=128;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='rgba(3,13,27,.82)'; ctx.fillRect(8,12,496,104);
+  ctx.strokeStyle=color; ctx.lineWidth=5; ctx.strokeRect(8,12,496,104);
+  ctx.font=`bold ${size}px Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle=color; ctx.fillText(text,256,64);
+  const tex=new THREE.CanvasTexture(c); const mesh=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.8),new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}));
+  mesh.position.set(x,y,z); mesh.lookAt(camera.position); scene.add(mesh); return mesh;
+}
+
+// Base platform and luminous perimeter
+box(scene,0,-.35,0,20,.5,15,floorMat);
+box(scene,0,-.62,0,20.4,.08,15.4,neon,false);
+const grid = new THREE.GridHelper(20,20,0x17617d,0x17334b); grid.position.y=-.08; scene.add(grid);
+for (let x=-9;x<=9;x+=3) box(scene,x,.01,-7.15,.035,.025,14,neon,false);
+
+// Outer glass walls, leaving front open
+box(scene,0,2,-7.35,20,4,.18,glass);
+box(scene,-9.9,2,0,.18,4,15,glass);
+box(scene,9.9,2,0,.18,4,15,glass);
+box(scene,0,3.95,0,20,.12,15,mat(0x172c45),false);
+for(let x=-9;x<=9;x+=3) line(scene,x,.05,-7.2,x,3.8,-7.2,neon,.025);
+for(let z=-6;z<=6;z+=3){ line(scene,-9.8,.05,z,-9.8,3.8,z,neon,.025); line(scene,9.8,.05,z,9.8,3.8,z,neon,.025); }
+
+// Department zones / partitions
+const rooms = [
+ {id:'ceo',name:'RUANG CEO',desc:'Pusat keputusan perusahaan. Area kerja CEO FTS.',x:-6,z:-4,w:7,d:5,color:0x00cfff},
+ {id:'board',name:'RUANG DIREKSI',desc:'Rapat strategi dan koordinasi manajemen.',x:2,z:-4,w:8,d:5,color:0x8a54ff},
+ {id:'studio',name:'STUDIO PRODUKSI',desc:'Tim AI Video Producer menyiapkan konsep dan produksi.',x:-6,z:3,w:7,d:6,color:0x00d7b0},
+ {id:'edit',name:'RUANG EDITING',desc:'Tim editor menyusun dan menyelesaikan video.',x:1,z:3,w:6,d:6,color:0xffa34d},
+ {id:'marketing',name:'MARKETING & GROWTH',desc:'Tim pertumbuhan channel, promosi, dan publikasi.',x:7,z:3,w:5,d:6,color:0xff4f9a}
+];
+const clickable=[];
+for(const r of rooms){
+  const edgeMat=mat(r.color,.15,.25,r.color);
+  // low partition walls
+  const wallH=1.35;
+  box(scene,r.x-r.w/2,.68,r.z-r.d/2,r.w,.08,.08,edgeMat,false);
+  box(scene,r.x-r.w/2,.68,r.z+r.d/2,r.w,.08,.08,edgeMat,false);
+  box(scene,r.x-r.w/2,.68,r.z,.08,wallH,r.d,glass,false);
+  box(scene,r.x+r.w/2,.68,r.z,.08,wallH,r.d,glass,false);
+  const pad=box(scene,r.x,.035,r.z,r.w-.25,.035,r.d-.25,mat(0x13273a,.3,.4),false);
+  pad.userData.room=r; clickable.push(pad);
+  const c=document.createElement('canvas'); c.width=512;c.height=128;const ctx=c.getContext('2d');
+  ctx.fillStyle='#071525';ctx.fillRect(0,0,512,128);ctx.strokeStyle='#'+r.color.toString(16).padStart(6,'0');ctx.lineWidth=6;ctx.strokeRect(5,5,502,118);
+  ctx.fillStyle='#e8faff';ctx.font='bold 40px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(r.name,256,65);
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.8),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,side:THREE.DoubleSide}));
+  sign.position.set(r.x,2.65,r.z-r.d/2+.1); scene.add(sign);
+}
+
+// Desk + workstation
+function workstation(x,z,accent=neon){
+  const g=new THREE.Group(); g.position.set(x,0,z); scene.add(g);
+  box(g,0,.78,0,1.7,.12,.85,wood);
+  for(const dx of [-.72,.72]) for(const dz of [-.32,.32]) box(g,dx,.38,dz,.08,.75,.08,dark);
+  box(g,0,1.42,-.18,.9,.58,.08,dark);
+  box(g,0,1.42,-.125,.78,.43,.025,screenMat,false);
+  box(g,0,1.11,-.15,.12,.08,.12,white,false);
+  box(g,0,.88,.28,.55,.025,.22,dark);
+  // chair
+  box(g,0,.58,.95,.65,.12,.6,dark);
+  box(g,0,1.05,1.22,.62,.85,.12,dark);
+  line(g,0,.52,.95,0,.15,.95,white,.045);
+  const glow=box(g,0,1.72,-.12,.7,.018,.018,accent,false);
+  return g;
+}
+workstation(-6,-4,neon); workstation(-3.8,-4,neon);
+workstation(1,-4,purple); workstation(4,-4,purple);
+workstation(-7,3,mat(0x00d7b0,.2,.25,0x00a080)); workstation(-4.5,3,mat(0x00d7b0,.2,.25,0x00a080));
+workstation(0,3,mat(0xffa34d,.2,.25,0x884400)); workstation(2.4,3,mat(0xffa34d,.2,.25,0x884400));
+workstation(6.5,3,mat(0xff4f9a,.2,.25,0x8a174c));
+
+// Stylized human avatar
+function avatar(x,z,shirt=0x25bde0){
+ const g=new THREE.Group(); g.position.set(x,0,z); scene.add(g);
+ const body=new THREE.Mesh(new THREE.CylinderGeometry(.23,.3,.85,10),mat(shirt,.1,.65)); body.position.y=.95; body.castShadow=true;g.add(body);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.23,16,12),mat(0xd7a47b));head.position.y=1.55;head.castShadow=true;g.add(head);
+ const hair=new THREE.Mesh(new THREE.SphereGeometry(.235,16,8,0,Math.PI*2,0,Math.PI*.55),dark);hair.position.y=1.64;g.add(hair);
+ for(const dx of [-.12,.12]){ const leg=new THREE.Mesh(new THREE.CylinderGeometry(.075,.09,.55,8),dark);leg.position.set(dx,.28,0);g.add(leg);}
+ const arm1=new THREE.Mesh(new THREE.CylinderGeometry(.07,.08,.58,8),mat(0xd7a47b));arm1.position.set(-.31,1.0,0);arm1.rotation.z=-.35;g.add(arm1);
+ const arm2=arm1.clone();arm2.position.x=.31;arm2.rotation.z=.35;g.add(arm2);
+ return g;
+}
+avatar(-5.2,-2.6,0x1bbde5); avatar(2,-2.6,0x9366ff); avatar(-5.5,4.5,0x00d6ad);
+avatar(1.1,4.5,0xffa34d); avatar(7,4.5,0xff4f9a);
+
+// CEO feature wall + holographic display
+box(scene,-6,2.1,-6.85,4.5,2.1,.08,dark);
+box(scene,-6,2.1,-6.79,4.2,1.8,.025,screenMat,false);
+for(let i=0;i<4;i++){ box(scene,-7.35+i*.9,2.05,-6.75,.55,.05,.02,[neon,purple,mat(0x00d7b0),mat(0xff4f9a)][i],false); }
+label('FTS COMMAND',-6,3.45,-6.7,'#75eaff',52);
+
+// Ceiling light strips
+for(let x=-8;x<=8;x+=4) box(scene,x,3.82,0,.045,.025,13,neon,false);
+for(let z=-5;z<=5;z+=5) box(scene,0,3.82,z,18,.025,.045,purple,false);
+
+// Small plants
+function plant(x,z){
+ const pot=new THREE.Mesh(new THREE.CylinderGeometry(.22,.28,.4,12),wood);pot.position.set(x,.2,z);scene.add(pot);
+ for(let i=0;i<5;i++){const leaf=new THREE.Mesh(new THREE.ConeGeometry(.12,.8,7),mat(0x18a878));leaf.position.set(x+Math.sin(i*1.25)*.18,.75,z+Math.cos(i*1.25)*.18);leaf.rotation.z=Math.sin(i*1.25)*.35;scene.add(leaf);}
+}
+plant(-9,-6); plant(9,-6); plant(-9,6); plant(9,6);
+
+// Click / tap room selection
+const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',e=>{
+ pointer.x=(e.clientX/innerWidth)*2-1; pointer.y=-(e.clientY/innerHeight)*2+1;
+ raycaster.setFromCamera(pointer,camera);
+ const hits=raycaster.intersectObjects(clickable);
+ if(hits.length){const r=hits[0].object.userData.room; document.getElementById('roomName').textContent=r.name;document.getElementById('roomDesc').textContent=r.desc;controls.target.set(r.x,0,r.z);}
+});
+function setView(v){
+ if(v==='overview'){camera.position.set(15,15,19);controls.target.set(0,0,0);document.getElementById('roomName').textContent='FTS AI Headquarters';document.getElementById('roomDesc').textContent='Tampilan keseluruhan kantor virtual Forex Trading Studio.';}
+ const r=rooms.find(a=>a.id===v);
+ if(r){camera.position.set(r.x+5,7,r.z+6);controls.target.set(r.x,0,r.z);document.getElementById('roomName').textContent=r.name;document.getElementById('roomDesc').textContent=r.desc;}
+}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+document.getElementById('reset').addEventListener('click',()=>setView('overview'));
+
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera);}
+animate();
+loading.style.display='none';
+</script>
+</body>
+</html>
