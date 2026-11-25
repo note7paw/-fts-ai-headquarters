@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FTS AI Headquarters 2.2</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<style>
+*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#07111f;color:#fff;font-family:Arial,sans-serif}
+#top,#info{position:absolute;top:10px;z-index:5;background:#10243bef;border:1px solid #2c80ad;border-radius:12px;padding:10px 13px}#top{left:10px}#top h2{font-size:16px;color:#55d9ff;margin:0 0 4px}#top small{color:#b9d8e8}#info{right:10px;font-size:10px;line-height:1.5}
+#controls{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:95%}
+button{background:#123b59;color:#fff;border:1px solid #42c9f5;border-radius:8px;padding:9px 12px;font-weight:bold;cursor:pointer}button:active{background:#087ca5}#ceoFloat{position:fixed;right:12px;bottom:105px;z-index:20;background:#087ca5;border:2px solid #55d9ff;border-radius:12px;padding:13px 15px;box-shadow:0 0 18px #087ca588}
+#hint{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);z-index:4;color:#b9eaff;font-size:10px;background:#071827bb;padding:7px 12px;border-radius:20px;white-space:nowrap}
+#panel{display:none;position:fixed;z-index:30;top:50%;left:50%;transform:translate(-50%,-50%);width:min(94%,440px);max-height:82vh;overflow:auto;background:#10243b;border:1px solid #43cfff;border-radius:15px;padding:16px;box-shadow:0 0 30px #087ca566}#panel h3{color:#61dcff;margin:0 0 12px}#panel p{font-size:13px;line-height:1.45}#panel input,#panel select,#panel textarea{width:100%;padding:11px;margin:6px 0 10px;background:#071827;color:#fff;border:1px solid #34799a;border-radius:8px}#panel textarea{min-height:80px}#panel label{font-size:12px;color:#b9d8e8}#close{float:right}.task{border:1px solid #285777;border-radius:9px;padding:10px;margin:9px 0;background:#0b1c2d;font-size:13px;line-height:1.5}.task button{margin:5px 4px 0 0;padding:8px;font-size:11px}.pill{display:inline-block;padding:3px 7px;border-radius:20px;background:#173d59;color:#9fe8ff;font-size:10px;margin:4px 0}.muted{color:#b9d8e8;font-size:11px}.actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.danger{border-color:#ff8b8b;background:#512b37}.good{border-color:#66dfa9;background:#14513f}hr{border:0;border-top:1px solid #285777;margin:13px 0}
+@media(max-width:500px){#top h2{font-size:13px}#top small{font-size:9px}#info{font-size:9px;padding:8px}#controls button{padding:8px 9px;font-size:10px}#ceoFloat{bottom:108px;right:9px;font-size:11px}#hint{bottom:70px}}
+</style>
+</head>
+<body>
+<div id="top"><h2>FTS AI HEADQUARTERS</h2><small>Forex Trading Studio • Version 2.2</small></div>
+<div id="info">CEO OFFICE<br>10 TEAM MEMBERS<br><span id="taskCount">0 TASKS</span></div>
+<div id="hint">Ketuk avatar anggota tim untuk membuka profil</div>
+<div id="controls"><button onclick="home()">HOME</button><button onclick="move(-7,0)">LEFT</button><button onclick="move(7,0)">RIGHT</button><button onclick="move(0,7)">FRONT</button><button onclick="move(0,-7)">BACK</button></div>
+<button id="ceoFloat" onclick="openCommand()">CEO COMMAND</button>
+<div id="panel"><button id="close" onclick="closePanel()">TUTUP ✕</button><div id="panelContent"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x07111f);
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,1000);camera.position.set(13,12,18);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));document.body.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1,0);controls.maxPolarAngle=Math.PI/2.05;controls.minDistance=7;controls.maxDistance=35;
+scene.add(new THREE.HemisphereLight(0x9edcff,0x18243b,2));const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(8,15,10);scene.add(light);
+function box(w,h,d,color,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.55}));m.position.set(x,y,z);scene.add(m);return m}
+// Ruang kantor 3D
+box(18,.4,14,0x172b40,0,-.2,0);box(12,.08,9,0x203d55,0,.05,0);box(18,5,.3,0x102c45,0,2.5,-7);box(.3,5,14,0x102c45,-9,2.5,0);box(.3,5,14,0x102c45,9,2.5,0);box(18,4,.12,0x17617b,0,2.5,7);
+box(3,.25,1.4,0x38a9cf,0,1,-4);box(.15,1,.15,0x9bbacb,-1.3,.5,-4);box(.15,1,.15,0x9bbacb,1.3,.5,-4);box(1,.9,.8,0x1b263d,0,.55,-2.7);box(6,3,.2,0x087eaa,0,3,-6.7);box(5.5,2.5,.08,0x061827,0,3,-6.55);
+const people=[
+{name:'Raka',role:'CEO',job:'Memimpin strategi dan keputusan perusahaan.'},
+{name:'Maya',role:'Managing Director',job:'Mengatur arah dan koordinasi seluruh divisi.'},
+{name:'Dimas',role:'Studio Director',job:'Mengawasi produksi konten dan operasional studio.'},
+{name:'Nadia',role:'Operations',job:'Mengatur alur kerja dan administrasi operasional.'},
+{name:'Arif',role:'AI Video Producer',job:'Menyusun konsep dan produksi video berbasis AI.'},
+{name:'Sinta',role:'Video Producer',job:'Menyiapkan naskah, storyboard, dan produksi video.'},
+{name:'Bima',role:'Video Editor',job:'Mengedit video dan menyusun hasil akhir.'},
+{name:'Luna',role:'Motion Editor',job:'Membuat motion graphic dan animasi.'},
+{name:'Tara',role:'Growth Manager',job:'Mengembangkan strategi pertumbuhan YouTube.'},
+{name:'Fajar',role:'Marketing',job:'Mengelola pemasaran dan promosi konten.'}];
+const colors=[0x27d7ff,0x398cff,0x9b69ff,0x29c89b,0xffb347],clickable=[],animated=[];
+function makeText(text,x,y,z){const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#061827';ctx.fillRect(0,0,512,128);ctx.fillStyle='#65ddff';ctx.font='bold 35px Arial';ctx.textAlign='center';ctx.fillText(text,256,78);const texture=new THREE.CanvasTexture(c);const plane=new THREE.Mesh(new THREE.PlaneGeometry(2.6,.65),new THREE.MeshBasicMaterial({map:texture,transparent:true,side:THREE.DoubleSide}));plane.position.set(x,y,z);scene.add(plane)}
+people.forEach((p,i)=>{const x=-6.5+(i%5)*3.25,z=i<5?1.5:4.5;box(1.8,.2,1,0x247a9e,x,.65,z);box(.12,.65,.12,0x9bbacb,x-.7,.3,z);box(.12,.65,.12,0x9bbacb,x+.7,.3,z);box(.45,.8,.45,colors[i%5],x,1.25,z-.9);const head=new THREE.Mesh(new THREE.SphereGeometry(.38,20,20),new THREE.MeshStandardMaterial({color:0xffc99b}));head.position.set(x,2,z-.9);head.userData.personIndex=i;scene.add(head);clickable.push(head);animated.push(head);makeText(p.name+' - '+p.role,x,2.8,z-.9)});
+for(let x=-7;x<=7;x+=3.5){const lamp=new THREE.PointLight(0x32bfff,15,8);lamp.position.set(x,4.3,0);scene.add(lamp)}
+// Data tugas disimpan di browser agar tidak hilang saat halaman dimuat ulang pada perangkat yang sama.
+let tasks=[];try{tasks=JSON.parse(localStorage.getItem('fts22_tasks')||'[]')}catch(e){tasks=[]}
+const statuses=['PENDING','IN PROGRESS','REVIEW','DONE'];
+function persist(){localStorage.setItem('fts22_tasks',JSON.stringify(tasks));updateCount()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showPanel(html){document.getElementById('panelContent').innerHTML=html;document.getElementById('panel').style.display='block'}
+window.closePanel=()=>document.getElementById('panel').style.display='none';
+window.openProfile=i=>{const p=people[i],count=tasks.filter(t=>t.person===i).length;showPanel(`<h3>PROFIL ANGGOTA FTS</h3><h2>${p.name}</h2><p><b>Jabatan:</b> ${p.role}</p><p><b>Tanggung jawab:</b> ${p.job}</p><p><b>Jumlah tugas:</b> ${count}</p>${i===0?'<p class="muted">Raka adalah CEO dan tidak menerima penugasan dari dirinya sendiri.</p>':`<button onclick="assignTo(${i})">BERIKAN TUGAS</button>`}`)};
+window.assignTo=i=>{showPanel(`<h3>BERIKAN TUGAS</h3><p>Anggota: <b>${people[i].name}</b></p><label>Instruksi CEO</label><textarea id="taskInput" placeholder="Tuliskan tugas dengan jelas..."></textarea><button onclick="saveTask(${i})">KIRIM TUGAS</button>`)};
+window.openCommand=()=>{const opts=people.map((p,i)=>i===0?'':`<option value="${i}">${p.name} — ${p.role}</option>`).join('');showPanel(`<h3>CEO COMMAND CENTER</h3><p>Selamat datang, CEO Raka. Berikan tugas dan pantau perkembangannya.</p><label>Pilih anggota tim</label><select id="assignee"><option value="" selected disabled>-- Pilih anggota tim --</option>${opts}</select><label>Instruksi pekerjaan</label><textarea id="taskInput" placeholder="Contoh: Buat 5 ide konten YouTube Forex untuk pemula..."></textarea><button onclick="saveCommand()">KIRIM INSTRUKSI</button><hr><h3>RINGKASAN TUGAS</h3><p class="muted">${statuses.map(s=>`${s}: ${tasks.filter(t=>t.status===s).length}`).join(' · ')}</p><h3>DAFTAR TUGAS</h3><div id="taskList">${renderTasks()}</div>`)};
+window.saveCommand=()=>{const selected=document.getElementById('assignee').value;if(selected===''){alert('Pilih anggota tim terlebih dahulu.');return}saveTask(Number(selected))};
+window.saveTask=i=>{const input=document.getElementById('taskInput'),value=input.value.trim();if(!value){alert('Tuliskan instruksi terlebih dahulu.');return}tasks.push({id:Date.now(),person:i,description:value,status:'PENDING',result:'',created:new Date().toLocaleString('id-ID')});persist();openCommand()};
+function renderTasks(){if(!tasks.length)return '<p>Belum ada tugas. CEO dapat memberikan instruksi pertama.</p>';return tasks.map((t,i)=>`<div class="task"><b>${people[t.person]?.name||'Anggota tim'}</b><br><span class="pill">${t.status}</span><br>${esc(t.description)}<br><span class="muted">Dibuat: ${esc(t.created||'-')}</span>${t.result?`<p><b>Hasil/laporan:</b><br>${esc(t.result)}</p>`:''}<div class="actions">${t.status==='PENDING'?`<button onclick="setStatus(${i},'IN PROGRESS')">MULAI TUGAS</button>`:''}${t.status==='IN PROGRESS'?`<button onclick="submitReview(${i})">KIRIM UNTUK REVIEW</button>`:''}${t.status==='REVIEW'?`<button class="good" onclick="approveTask(${i})">SETUJUI / DONE</button><button class="danger" onclick="returnTask(${i})">MINTA REVISI</button>`:''}${t.status!=='DONE'?`<button onclick="editTask(${i})">UBAH TUGAS</button>`:''}</div></div>`).join('')}
+window.setStatus=(i,status)=>{tasks[i].status=status;persist();openCommand()};
+window.submitReview=i=>{showPanel(`<h3>KIRIM HASIL UNTUK REVIEW</h3><p>Tugas: ${esc(tasks[i].description)}</p><label>Catatan atau hasil pekerjaan</label><textarea id="resultInput" placeholder="Tuliskan hasil pekerjaan atau laporan untuk CEO..."></textarea><button onclick="saveReview(${i})">KIRIM KE CEO</button>`)};
+window.saveReview=i=>{const v=document.getElementById('resultInput').value.trim();if(!v){alert('Isi laporan singkat sebelum mengirim review.');return}tasks[i].result=v;tasks[i].status='REVIEW';persist();openCommand()};
+window.approveTask=i=>{if(!confirm('CEO menyetujui hasil tugas ini dan menandainya DONE?'))return;tasks[i].status='DONE';persist();openCommand()};
+window.returnTask=i=>{tasks[i].status='IN PROGRESS';persist();openCommand()};
+window.editTask=i=>{showPanel(`<h3>UBAH TUGAS</h3><label>Instruksi pekerjaan</label><textarea id="editInput">${esc(tasks[i].description)}</textarea><button onclick="saveEdit(${i})">SIMPAN PERUBAHAN</button>`)};
+window.saveEdit=i=>{const v=document.getElementById('editInput').value.trim();if(!v){alert('Instruksi tidak boleh kosong.');return}tasks[i].description=v;persist();openCommand()};
+function updateCount(){document.getElementById('taskCount').textContent=tasks.length+' TASKS'}updateCount();
+window.home=()=>{camera.position.set(13,12,18);controls.target.set(0,1,0);controls.update()};window.move=(x,z)=>{camera.position.set(x+8,9,z+12);controls.target.set(x*.35,1,z*.35);controls.update()};
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();renderer.domElement.addEventListener('pointerdown',event=>{if(document.getElementById('panel').style.display==='block')return;const r=renderer.domElement.getBoundingClientRect();pointer.x=((event.clientX-r.left)/r.width)*2-1;pointer.y=-((event.clientY-r.top)/r.height)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(clickable);if(hits.length)window.openProfile(hits[0].object.userData.personIndex)});
+function animate(){requestAnimationFrame(animate);const t=performance.now()*.001;animated.forEach((a,i)=>a.position.y=2+Math.sin(t*1.5+i)*.035);controls.update();renderer.render(scene,camera)}animate();
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>
