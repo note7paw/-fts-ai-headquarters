@@ -64,12 +64,34 @@ people.forEach((p,i)=>{
  box(.52,.12,.52,0x263d55,x,.72,workZ-.12);box(.12,.68,.12,0x8da8bb,x,.36,workZ-.12);
  }
  const root=new THREE.Group();root.position.set(x,0,z-.9);scene.add(root);
- const torso=limb(colors[i%5],.52,.82,.34);torso.position.set(0,1.28,0);root.add(torso);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.34,20,20),new THREE.MeshStandardMaterial({color:0xffc99b,roughness:.8}));head.position.set(0,1.98,0);head.userData.personIndex=i;root.add(head);clickable.push(head);
- const leftArm=new THREE.Group();leftArm.position.set(-.34,1.58,0);root.add(leftArm);const la=limb(colors[i%5],.18,.62,.2);la.position.y=-.29;leftArm.add(la);
- const rightArm=new THREE.Group();rightArm.position.set(.34,1.58,0);root.add(rightArm);const ra=limb(colors[i%5],.18,.62,.2);ra.position.y=-.29;rightArm.add(ra);
- const leftLeg=new THREE.Group();leftLeg.position.set(-.15,.88,0);root.add(leftLeg);const ll=limb(0x26364b,.22,.72,.25);ll.position.y=-.3;leftLeg.add(ll);
- const rightLeg=new THREE.Group();rightLeg.position.set(.15,.88,0);root.add(rightLeg);const rl=limb(0x26364b,.22,.72,.25);rl.position.y=-.3;rightLeg.add(rl);
+ const skin=[0xffc99b,0xe9b58e,0xf3c7a0,0xd99b75,0xf1c09a,0xc98d68,0xffd2aa,0xe6ad87,0xf4c6a1,0xdba17d][i];
+ const hair=[0x29212b,0x3a241b,0x171b28,0x5b3020,0x24202a,0x38251d,0x191923,0x513321,0x30231f,0x201b20][i];
+ const outfit=[0x173b62,0x2c78a8,0x704c9b,0x27765e,0x253f65,0xb45b43,0x3c527c,0x815a9c,0x267d86,0x9a6532][i];
+ const pants=[0x202c40,0x26364b,0x303047,0x263d3b,0x202c40][i%5];
+ const mat=(color,roughness=.72)=>new THREE.MeshStandardMaterial({color,roughness});
+ const ellipsoid=(color,sx,sy,sz,px,py,pz)=>{const m=new THREE.Mesh(new THREE.SphereGeometry(1,18,14),mat(color));m.scale.set(sx,sy,sz);m.position.set(px,py,pz);root.add(m);return m};
+ const capsule=(color,r,h,px,py,pz)=>{const m=new THREE.Mesh(new THREE.CapsuleGeometry(r,h,4,8),mat(color));m.position.set(px,py,pz);root.add(m);return m};
+ const torso=capsule(outfit,.27,.48,0,1.31,0);
+ ellipsoid(0xf4f5f7,.13,.29,.035,0,1.34,.265);
+ if(i===0){ellipsoid(0xd9b34a,.035,.19,.045,0,1.36,.31);ellipsoid(0xd9b34a,.045,.045,.045,0,1.12,.31);}
+ const neck=capsule(skin,.09,.13,0,1.78,0);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.32,24,18),mat(skin));head.position.set(0,2.08,0);head.userData.personIndex=i;root.add(head);clickable.push(head);
+ // Wajah ekspresif: telinga, mata, alis, hidung, dan senyum.
+ ellipsoid(skin,.075,.105,.07,-.315,2.08,0);ellipsoid(skin,.075,.105,.07,.315,2.08,0);
+ ellipsoid(0xffffff,.075,.09,.035,-.115,2.12,.285);ellipsoid(0xffffff,.075,.09,.035,.115,2.12,.285);
+ ellipsoid(0x263044,.036,.05,.025,-.105,2.115,.316);ellipsoid(0x263044,.036,.05,.025,.125,2.115,.316);
+ ellipsoid(hair,.085,.025,.025,-.115,2.235,.29);ellipsoid(hair,.085,.025,.025,.115,2.235,.29);
+ ellipsoid(skin,.055,.07,.07,0,2.02,.315);
+ const mouth=limb(0x8e4545,.12,.018,.018);mouth.position.set(0,1.94,.31);root.add(mouth);
+ // Rambut dengan variasi potongan untuk tiap anggota.
+ ellipsoid(hair,.32,.16,.33,0,2.28,-.005);
+ if(i%3===0){ellipsoid(hair,.12,.22,.29,-.23,2.16,-.015);ellipsoid(hair,.12,.22,.29,.23,2.16,-.015);}
+ else if(i%3===1){ellipsoid(hair,.22,.12,.30,-.13,2.30,.06);}
+ else{ellipsoid(hair,.29,.12,.30,.04,2.32,-.04);ellipsoid(hair,.10,.17,.24,.25,2.18,-.02);}
+ const leftArm=new THREE.Group();leftArm.position.set(-.31,1.57,0);root.add(leftArm);const la=capsule(outfit,.095,.40,0,-.27,0);leftArm.add(la);const lh=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),mat(skin));lh.position.set(0,-.51,.015);leftArm.add(lh);
+ const rightArm=new THREE.Group();rightArm.position.set(.31,1.57,0);root.add(rightArm);const ra=capsule(outfit,.095,.40,0,-.27,0);rightArm.add(ra);const rh=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),mat(skin));rh.position.set(0,-.51,.015);rightArm.add(rh);
+ const leftLeg=new THREE.Group();leftLeg.position.set(-.15,.88,0);root.add(leftLeg);const ll=capsule(pants,.105,.40,0,-.23,0);leftLeg.add(ll);const ls=new THREE.Mesh(new THREE.SphereGeometry(.12,12,10),mat(0x101923));ls.scale.set(1,.55,1.45);ls.position.set(0,-.49,.07);leftLeg.add(ls);
+ const rightLeg=new THREE.Group();rightLeg.position.set(.15,.88,0);root.add(rightLeg);const rl=capsule(pants,.105,.40,0,-.23,0);rightLeg.add(rl);const rs=new THREE.Mesh(new THREE.SphereGeometry(.12,12,10),mat(0x101923));rs.scale.set(1,.55,1.45);rs.position.set(0,-.49,.07);rightLeg.add(rs);
  animated.push({root,head,torso,leftArm,rightArm,leftLeg,rightLeg,baseX:x,baseZ:z-.9,deskZ:z+.25,phase:i*1.7,index:i});
  makeText(p.name+' - '+p.role,x,i===0?2.15:2.8,i===0?-5.1:z-.9);
 });
