@@ -55,7 +55,22 @@ people.forEach((p,i)=>{
   box(1.25,.12,.12,0x31516a,0,.95,-5.02);
   makeText('RUANG CEO ANANG',0,2.55,-5.45);
  }else{
-  box(1.8,.2,1,0x247a9e,x,.65,z);box(.12,.65,.12,0x9bbacb,x-.7,.3,z);box(.12,.65,.12,0x9bbacb,x+.7,.3,z);
+  // Workstation karyawan: meja penuh, monitor, keyboard, dan kursi individual.
+  box(1.85,.16,1.05,0x805b3d,x,.91,z+1.18);
+  box(1.72,.07,.94,0x392c2b,x,.80,z+1.18);
+  for(const dx of [-.76,.76]) for(const dz of [.79,1.57]) box(.09,.82,.09,0x9bbacb,x+dx,.39,z+dz);
+  box(.72,.48,.07,0x142c42,x,1.27,z+.88);
+  box(.64,.39,.035,0x071827,x,1.28,z+.92);
+  box(.54,.045,.38,0x18283a,x,1.02,z+.48);
+  box(.36,.025,.24,0x9bbacb,x,1.055,z+.48);
+  // Kursi berada di sisi kerja, terpisah dari meja.
+  box(.78,.14,.72,0x247a9e,x,.62,z-.58);
+  box(.76,.78,.13,0x17617b,x,.99,z-.91);
+  box(.12,.58,.12,0x9bbacb,x-.28,.31,z-.58);
+  box(.12,.58,.12,0x9bbacb,x+.28,.31,z-.58);
+  box(.12,.58,.12,0x9bbacb,x-.28,.31,z-.92);
+  box(.12,.58,.12,0x9bbacb,x+.28,.31,z-.92);
+ }box(.12,.65,.12,0x9bbacb,x-.7,.3,z);box(.12,.65,.12,0x9bbacb,x+.7,.3,z);
  const workZ=z+.25;
  box(1.25,.12,.72,0x31516a,x,1.02,workZ+1.02);
  box(.09,.95,.09,0x8da8bb,x-.52,.52,workZ+.78);box(.09,.95,.09,0x8da8bb,x+.52,.52,workZ+.78);
@@ -88,6 +103,19 @@ people.forEach((p,i)=>{
  if(i%3===0){ellipsoid(hair,.12,.22,.29,-.23,2.16,-.015);ellipsoid(hair,.12,.22,.29,.23,2.16,-.015);}
  else if(i%3===1){ellipsoid(hair,.22,.12,.30,-.13,2.30,.06);}
  else{ellipsoid(hair,.29,.12,.30,.04,2.32,-.04);ellipsoid(hair,.10,.17,.24,.25,2.18,-.02);}
+ // Identitas visual tambahan agar tiap wajah tidak sekadar berganti warna baju.
+ if(i===1){ellipsoid(hair,.13,.19,.15,-.28,2.25,-.12);ellipsoid(hair,.13,.19,.15,.28,2.25,-.12);}
+ if(i===2){ellipsoid(hair,.10,.23,.12,.27,2.12,-.12);ellipsoid(0x493027,.22,.12,.12,0,1.91,.27);}
+ if(i===3){ellipsoid(0x493027,.22,.13,.12,0,1.91,.27);ellipsoid(hair,.08,.23,.12,-.28,2.15,-.1);}
+ if(i===4){ellipsoid(hair,.16,.22,.16,.27,2.27,-.08);}
+ if(i===5){ellipsoid(hair,.12,.2,.15,-.28,2.24,-.08);ellipsoid(0x493027,.2,.1,.1,0,1.91,.27);}
+ if(i===6){ellipsoid(0x252b36,.20,.055,.035,-.115,2.12,.32);ellipsoid(0x252b36,.20,.055,.035,.115,2.12,.32);ellipsoid(0x252b36,.025,.035,.025,0,2.12,.32);}
+ if(i===7){ellipsoid(hair,.12,.22,.14,-.28,2.22,-.08);ellipsoid(hair,.12,.22,.14,.28,2.22,-.08);}
+ if(i===8){ellipsoid(0x493027,.22,.12,.12,0,1.91,.27);ellipsoid(hair,.1,.2,.13,.28,2.2,-.08);}
+ if(i===9){ellipsoid(hair,.14,.21,.15,-.28,2.2,-.08);ellipsoid(0x493027,.22,.1,.12,0,1.91,.27);}
+ // Detail kerah dan aksen seragam kerja berbeda tiap anggota.
+ if(i!==0){ellipsoid([0xffffff,0xf2e6d0,0xffffff,0xe9f1f5,0xf5f0e8,0xffffff,0xd9e4ef,0xf5e9dc,0xffffff][(i-1)%9],.12,.09,.045,-.13,1.52,.245);ellipsoid([0xffffff,0xf2e6d0,0xffffff,0xe9f1f5,0xf5f0e8,0xffffff,0xd9e4ef,0xf5e9dc,0xffffff][(i-1)%9],.12,.09,.045,.13,1.52,.245);}
+
  const leftArm=new THREE.Group();leftArm.position.set(-.31,1.57,0);root.add(leftArm);const la=capsule(outfit,.095,.40,0,-.27,0);leftArm.add(la);const lh=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),mat(skin));lh.position.set(0,-.51,.015);leftArm.add(lh);
  const rightArm=new THREE.Group();rightArm.position.set(.31,1.57,0);root.add(rightArm);const ra=capsule(outfit,.095,.40,0,-.27,0);rightArm.add(ra);const rh=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),mat(skin));rh.position.set(0,-.51,.015);rightArm.add(rh);
  const leftLeg=new THREE.Group();leftLeg.position.set(-.15,.88,0);root.add(leftLeg);const ll=capsule(pants,.105,.40,0,-.23,0);leftLeg.add(ll);const ls=new THREE.Mesh(new THREE.SphereGeometry(.12,12,10),mat(0x101923));ls.scale.set(1,.55,1.45);ls.position.set(0,-.49,.07);leftLeg.add(ls);
