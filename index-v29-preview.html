@@ -111,6 +111,44 @@ people.forEach((p,i)=>{
  if(i===7){ellipsoid(hair,.12,.22,.14,-.28,2.22,-.08);ellipsoid(hair,.12,.22,.14,.28,2.22,-.08);}
  if(i===8){ellipsoid(0x493027,.22,.12,.12,0,1.91,.27);ellipsoid(hair,.1,.2,.13,.28,2.2,-.08);}
  if(i===9){ellipsoid(hair,.14,.21,.15,-.28,2.2,-.08);ellipsoid(0x493027,.22,.1,.12,0,1.91,.27);}
+ // Siluet dan aksesori unik per karakter: bentuk wajah, rambut, dan ciri profesi.
+ const faceShapes=[
+  [1.00,1.00,.94],[.94,1.05,.96],[1.08,.96,1.00],[.92,1.08,.94],[1.03,.98,1.02],
+  [.96,1.06,.94],[1.06,.98,1.00],[.93,1.08,.96],[1.02,1.00,.94],[1.07,.97,1.02]
+ ][i];
+ head.scale.set(...faceShapes);
+ torso.scale.x=[1.08,.94,1.12,.92,1.04,.94,1.10,.93,1.02,1.08][i];
+ // Rambut panjang, ikat belakang, sanggul, jambul, dan belahan dibuat berbeda.
+ if(i===1||i===5||i===7||i===8){
+   ellipsoid(hair,.11,.34,.13,-.29,1.98,-.08);
+   ellipsoid(hair,.11,.34,.13,.29,1.98,-.08);
+ }
+ if(i===3||i===8){
+   ellipsoid(hair,.17,.16,.17,.30,2.30,-.12);
+ }
+ if(i===4||i===9){
+   ellipsoid(hair,.09,.19,.11,-.27,2.32,-.03);
+   ellipsoid(hair,.09,.19,.11,.27,2.32,-.03);
+ }
+ // Kacamata untuk Dimas, anting untuk Nadia dan Luna, headset untuk editor.
+ if(i===2||i===6){
+   const frame=mat(0x202b39);
+   const g1=new THREE.Mesh(new THREE.BoxGeometry(.20,.035,.025),frame);g1.position.set(-.115,2.12,.326);root.add(g1);
+   const g2=new THREE.Mesh(new THREE.BoxGeometry(.20,.035,.025),frame);g2.position.set(.115,2.12,.326);root.add(g2);
+   const bridge=new THREE.Mesh(new THREE.BoxGeometry(.06,.025,.025),frame);bridge.position.set(0,2.12,.33);root.add(bridge);
+ }
+ if(i===3||i===7){
+   ellipsoid(0xe7c46a,.035,.045,.025,-.34,1.99,.01);
+   ellipsoid(0xe7c46a,.035,.045,.025,.34,1.99,.01);
+ }
+ if(i===6){
+   ellipsoid(0x202b39,.07,.07,.07,.34,2.05,-.02);
+   const band=new THREE.Mesh(new THREE.TorusGeometry(.34,.035,8,24,Math.PI),mat(0x202b39));band.position.set(0,2.15,0);band.rotation.z=Math.PI;root.add(band);
+ }
+ if(i===0){
+   // CEO Anang: rambut rapi dan dasi emas.
+   ellipsoid(0x29212b,.12,.10,.18,0,2.31,.12);
+ }
  // Detail kerah dan aksen seragam kerja berbeda tiap anggota.
  if(i!==0){ellipsoid([0xffffff,0xf2e6d0,0xffffff,0xe9f1f5,0xf5f0e8,0xffffff,0xd9e4ef,0xf5e9dc,0xffffff][(i-1)%9],.12,.09,.045,-.13,1.52,.245);ellipsoid([0xffffff,0xf2e6d0,0xffffff,0xe9f1f5,0xf5f0e8,0xffffff,0xd9e4ef,0xf5e9dc,0xffffff][(i-1)%9],.12,.09,.045,.13,1.52,.245);}
 
