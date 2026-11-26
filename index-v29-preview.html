@@ -69,8 +69,11 @@ people.forEach((p,i)=>{
   box(.62,.045,.34,0x17283a,x,1.005,deskZ+.30);
   box(.11,.035,.13,0xd7e5ed,x+.48,1.01,deskZ+.30);
   // Lampu status meja: biru idle, hijau bekerja, kuning menunggu review.
-  deskStatus=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),new THREE.MeshStandardMaterial({color:0x35cfff,emissive:0x126080,emissiveIntensity:.8}));
-  deskStatus.position.set(x+.48,1.68,deskZ-.24);scene.add(deskStatus);
+  // Beacon status dibuat besar dan diletakkan tepat di atas sudut meja agar terlihat dari kamera.
+  const beaconBase=new THREE.Mesh(new THREE.CylinderGeometry(.095,.12,.10,16),new THREE.MeshStandardMaterial({color:0x263f55,metalness:.35,roughness:.4}));
+  beaconBase.position.set(x+.82,1.02,deskZ+.36);scene.add(beaconBase);
+  deskStatus=new THREE.Mesh(new THREE.SphereGeometry(.14,16,12),new THREE.MeshStandardMaterial({color:0x35cfff,emissive:0x126080,emissiveIntensity:1.8,roughness:.25}));
+  deskStatus.position.set(x+.82,1.17,deskZ+.36);scene.add(deskStatus);
   // Kursi terpisah di sisi belakang meja, lengkap dengan sandaran dan kaki.
   const chairZ=z-.62;
   box(.82,.16,.78,0x1685a8,x,.58,chairZ);
