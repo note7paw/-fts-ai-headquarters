@@ -70,7 +70,7 @@ people.forEach((p,i)=>{
  const rightArm=new THREE.Group();rightArm.position.set(.34,1.58,0);root.add(rightArm);const ra=limb(colors[i%5],.18,.62,.2);ra.position.y=-.29;rightArm.add(ra);
  const leftLeg=new THREE.Group();leftLeg.position.set(-.15,.88,0);root.add(leftLeg);const ll=limb(0x26364b,.22,.72,.25);ll.position.y=-.3;leftLeg.add(ll);
  const rightLeg=new THREE.Group();rightLeg.position.set(.15,.88,0);root.add(rightLeg);const rl=limb(0x26364b,.22,.72,.25);rl.position.y=-.3;rightLeg.add(rl);
- animated.push({root,head,torso,leftArm,rightArm,leftLeg,rightLeg,baseX:x,baseZ:z-.9,deskZ:workZ,phase:i*1.7,index:i});
+ animated.push({root,head,torso,leftArm,rightArm,leftLeg,rightLeg,baseX:x,baseZ:z-.9,deskZ:z+.25,phase:i*1.7,index:i});
  makeText(p.name+' - '+p.role,x,i===0?2.15:2.8,i===0?-5.1:z-.9);
 });
 for(let x=-7;x<=7;x+=3.5){const lamp=new THREE.PointLight(0x32bfff,15,8);lamp.position.set(x,4.3,0);scene.add(lamp)}
