@@ -284,6 +284,7 @@ window.home=()=>{camera.position.set(13,12,18);controls.target.set(0,1,0);contro
   const gait=Math.sin(t*8+a.phase);
   a.leftLeg.rotation.x=gait*.42;a.rightLeg.rotation.x=-gait*.42;
   a.leftArm.rotation.x=-gait*.28;a.rightArm.rotation.x=gait*.28;
+  a.head.rotation.x=0;a.head.rotation.y=0;a.torso.rotation.x=0;
   a.root.position.y=Math.abs(Math.sin(t*8+a.phase))*.045;
  }else if(busy){
   a.root.rotation.y=0;
