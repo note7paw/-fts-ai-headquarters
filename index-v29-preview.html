@@ -64,9 +64,20 @@ window.copyVideoText=async(text)=>{
 };
 window.copyVideoSection=i=>{const s=window.videoSections[i];if(s)window.copyVideoText(s.text)};
 window.copyAllVideoSections=()=>window.copyVideoText(window.videoSections.map(s=>s.text).join('\\n\\n'));
+function videoCorrectionHistoryHtml(){
+ const t=tasks.find(x=>x.id===window.videoTaskId),history=t?.correctionHistory||[];
+ if(!history.length)return '<div class="video-history"><h4>RIWAYAT KOREKSI CEO</h4><p class="muted">Belum ada koreksi yang tercatat untuk dokumen ini.</p></div>';
+ return '<div class="video-history"><h4>RIWAYAT KOREKSI CEO ('+history.length+')</h4>'+history.slice().reverse().map(h=>'<details class="video-section"><summary>'+esc(h.section)+' · '+esc(h.type)+' · '+esc(h.at)+'</summary><div class="video-section-body"><p><b>Catatan CEO</b><br>'+esc(h.note||'Edit manual CEO')+'</p><p><b>ISI SEBELUM</b></p><pre>'+esc(h.before)+'</pre><p><b>ISI SESUDAH</b></p><pre>'+esc(h.after)+'</pre></div></details>').join('')+'</div>';
+}
+window.showVideoCorrectionHistory=()=>{const el=document.getElementById('videoCorrectionHistory');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});};
+function recordVideoCorrection(type,section,before,after,note){
+ const t=tasks.find(x=>x.id===window.videoTaskId);if(!t)return;
+ if(!Array.isArray(t.correctionHistory))t.correctionHistory=[];
+ t.correctionHistory.push({type,section,before,after,note:note||'',at:new Date().toLocaleString('id-ID'),by:'CEO'});
+}
 function renderVideoDocument(raw){
  window.videoSections=splitVideoDocument(raw);
- return '<div class="video-doc"><div class="video-doc-head"><h4>PAKET PRA-PRODUKSI · DOKUMEN CEO</h4><button class="video-copy-all" onclick="copyAllVideoSections()">SALIN SEMUA</button></div><p class="muted">CEO dapat mengedit isi bagian, menyimpan koreksi manual, atau meminta AI memperbaiki bagian terpilih saja.</p>'+window.videoSections.map((s,i)=>'<details class="video-section" open><summary>'+esc(s.title)+'</summary><div class="video-section-body"><label>ISI DOKUMEN — DAPAT DIEDIT CEO</label><textarea id="videoEdit_'+i+'" style="min-height:150px;white-space:pre-wrap">'+esc(s.text)+'</textarea><label>CATATAN KOREKSI UNTUK AI</label><textarea id="videoNote_'+i+'" placeholder="Contoh: perjelas penjelasan, perbaiki dialog, buat hook lebih kuat, atau sesuaikan prompt visual..."></textarea></div><div class="video-section-actions"><button onclick="copyVideoSection('+i+')">SALIN BAGIAN</button><button class="good" onclick="saveVideoManualEdit('+i+')">SIMPAN EDIT CEO</button><button onclick="requestVideoCorrection('+i+')">MINTA AI REVISI</button></div></details>').join('')+'</div>';
+ return '<div class="video-doc"><div class="video-doc-head"><h4>PAKET PRA-PRODUKSI · DOKUMEN CEO</h4><button class="video-copy-all" onclick="copyAllVideoSections()">SALIN SEMUA</button><button onclick="showVideoCorrectionHistory()">RIWAYAT KOREKSI CEO</button></div><p class="muted">CEO dapat mengedit isi bagian, menyimpan koreksi manual, atau meminta AI memperbaiki bagian terpilih saja.</p>'+window.videoSections.map((s,i)=>'<details class="video-section" open><summary>'+esc(s.title)+'</summary><div class="video-section-body"><label>ISI DOKUMEN — DAPAT DIEDIT CEO</label><textarea id="videoEdit_'+i+'" style="min-height:150px;white-space:pre-wrap">'+esc(s.text)+'</textarea><label>CATATAN KOREKSI UNTUK AI</label><textarea id="videoNote_'+i+'" placeholder="Contoh: perjelas penjelasan, perbaiki dialog, buat hook lebih kuat, atau sesuaikan prompt visual..."></textarea></div><div class="video-section-actions"><button onclick="copyVideoSection('+i+')">SALIN BAGIAN</button><button class="good" onclick="saveVideoManualEdit('+i+')">SIMPAN EDIT CEO</button><button onclick="requestVideoCorrection('+i+')">MINTA AI REVISI</button></div></details>').join('')+'</div>'+'<div id="videoCorrectionHistory">'+videoCorrectionHistoryHtml()+'</div>';
 }
 function syncVideoTask(note){
  const t=tasks.find(x=>x.id===window.videoTaskId);
@@ -78,7 +89,9 @@ function syncVideoTask(note){
 window.saveVideoManualEdit=i=>{
  const field=document.getElementById('videoEdit_'+i);
  if(!field||!window.videoSections[i])return;
- window.videoSections[i].text=field.value;
+ const before=window.videoSections[i].text,after=field.value;
+ window.videoSections[i].text=after;
+ recordVideoCorrection('EDIT MANUAL',window.videoSections[i].title,before,after,'');
  syncVideoTask('CEO mengedit bagian dokumen: '+window.videoSections[i].title);
  const result=document.getElementById('videoResult');
  if(result)result.innerHTML='<b>EDIT CEO TERSIMPAN</b><br>'+renderVideoDocument(window.videoSections.map(x=>x.text).join('\\n\\n'))+'<div class="notice">Perubahan manual tersimpan pada hasil tugas VIDEO STUDIO.</div>';
@@ -100,6 +113,7 @@ window.requestVideoCorrection=async i=>{
   const revised=String(data.result||'').trim();
   if(!revised)throw new Error('AI tidak mengirimkan hasil revisi.');
   window.videoSections[i].text=revised;
+  recordVideoCorrection('REVISI AI',section.title,original,revised,note);
   syncVideoTask('AI merevisi bagian "'+section.title+'" sesuai catatan CEO: '+note);
   const result=document.getElementById('videoResult');
   if(result)result.innerHTML='<b>REVISI AI BERHASIL</b><br>'+renderVideoDocument(window.videoSections.map(x=>x.text).join('\\n\\n'))+'<div class="notice">Hanya bagian yang dipilih yang diperbarui. Bagian lainnya dipertahankan.</div>';
