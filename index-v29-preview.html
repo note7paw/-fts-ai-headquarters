@@ -55,21 +55,26 @@ people.forEach((p,i)=>{
   box(1.25,.12,.12,0x31516a,0,.95,-5.02);
   makeText('RUANG CEO ANANG',0,2.55,-5.45);
  }else{
-  // Workstation karyawan: meja penuh, monitor, keyboard, dan kursi individual.
-  box(1.85,.16,1.05,0x805b3d,x,.91,z+1.18);
-  box(1.72,.07,.94,0x392c2b,x,.80,z+1.18);
-  for(const dx of [-.76,.76]) for(const dz of [.79,1.57]) box(.09,.82,.09,0x9bbacb,x+dx,.39,z+dz);
-  box(.72,.48,.07,0x142c42,x,1.27,z+.88);
-  box(.64,.39,.035,0x071827,x,1.28,z+.92);
-  box(.54,.045,.38,0x18283a,x,1.02,z+.48);
-  box(.36,.025,.24,0x9bbacb,x,1.055,z+.48);
-  // Kursi berada di sisi kerja, terpisah dari meja.
-  box(.78,.14,.72,0x247a9e,x,.62,z-.58);
-  box(.76,.78,.13,0x17617b,x,.99,z-.91);
-  box(.12,.58,.12,0x9bbacb,x-.28,.31,z-.58);
-  box(.12,.58,.12,0x9bbacb,x+.28,.31,z-.58);
-  box(.12,.58,.12,0x9bbacb,x-.28,.31,z-.92);
-  box(.12,.58,.12,0x9bbacb,x+.28,.31,z-.92);
+  // WORKSTATION INDIVIDUAL: dibuat kontras dan berada jelas di depan tiap avatar.
+  const deskZ=z+.18;
+  // Meja kayu dengan empat kaki yang terlihat.
+  box(2.05,.18,1.05,0x9a6841,x,.88,deskZ);
+  box(2.08,.07,1.08,0x49301f,x,.77,deskZ);
+  for(const dx of [-.82,.82]) for(const dz of [-.38,.38]) box(.11,.76,.11,0x9bbacb,x+dx,.38,deskZ+dz);
+  // Monitor, dudukan, keyboard, dan mouse.
+  box(.82,.58,.09,0x243b52,x,1.28,deskZ-.27);
+  box(.72,.46,.035,0x16a5c7,x,1.29,deskZ-.215);
+  box(.12,.18,.12,0x9bbacb,x,1.00,deskZ-.27);
+  box(.62,.045,.34,0x17283a,x,1.005,deskZ+.30);
+  box(.11,.035,.13,0xd7e5ed,x+.48,1.01,deskZ+.30);
+  // Kursi terpisah di sisi belakang meja, lengkap dengan sandaran dan kaki.
+  const chairZ=z-1.12;
+  box(.82,.16,.78,0x1685a8,x,.58,chairZ);
+  box(.82,.82,.16,0x12617f,x,.99,chairZ-.34);
+  box(.12,.48,.12,0x9bbacb,x-.31,.28,chairZ-.25);
+  box(.12,.48,.12,0x9bbacb,x+.31,.28,chairZ-.25);
+  box(.12,.48,.12,0x9bbacb,x-.31,.28,chairZ+.25);
+  box(.12,.48,.12,0x9bbacb,x+.31,.28,chairZ+.25);
  }
  const root=new THREE.Group();root.position.set(x,0,z-.9);scene.add(root);
  const skin=[0xffc99b,0xe9b58e,0xf3c7a0,0xd99b75,0xf1c09a,0xc98d68,0xffd2aa,0xe6ad87,0xf4c6a1,0xdba17d][i];
